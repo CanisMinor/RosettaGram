@@ -14,6 +14,7 @@
 #include "wordCount.h"
 #include "emissionParameters.h"
 #include "replaceRare.h"
+#include "trigramParameters.h"
 
 using namespace std;
 
@@ -48,7 +49,7 @@ int main()
    outCounts.close();
 
 
-   // ----------------------- TESTING PHASE ------------------------
+   // ----------------------- TAGGING OF TEST DATA------------------
    const string sRare = "_RARE_";
    const string sDot = ".";
 
@@ -78,6 +79,22 @@ int main()
    }
    maxCounts.close();
    testFile.close();
+
+
+   // --------------- PROBABILITY PARAMETERS EVALUATION ------------
+   //evaluate trigram probabilities
+   ofstream probsFile;
+   probsFile.open("TrigramProbabilities.dat");
+   probsFile << "y_i" << "\t" << setw(24) << left << "y_{i-1}, y_{i-2}" << setw(16) << setprecision (8) << fixed << "q(y_i | y_{i-1}, y_{i-2})" << endl;
+   map<vector<string>, double> qParam = collectTrigramCounts();
+   for(pIter q = qParam.begin(); q != qParam.end(); ++q)
+   {
+       vector<string> currentTrigram = q->first;
+       double currentQ = q->second;
+       probsFile << currentTrigram[2] << "\t" << setw(24) << left << currentTrigram[0] + ", " + currentTrigram[1] << setw(16) << setprecision (8) << fixed << currentQ << endl;
+   }
+   probsFile.close();
+
 
 
    return 0;
